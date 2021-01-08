@@ -108,50 +108,9 @@ def job():
     # data = pd.read_csv('../data/2020-12-29.csv', converters={'代码': str})
 
 if __name__ == '__main__':
-    # schedule.every().day.at('19:00').do(job)
-    # while True:
-    #     schedule.run_pending()
-    #     time.sleep(10)
+    schedule.every().day.at('19:00').do(job)
+    while True:
+        schedule.run_pending()
+        time.sleep(10)
 
     # job()
-
-    import re
-
-    pattern = re.compile(r'(-*\d+\.\d+)%')
-    data = pd.read_csv('../data/2021-01-08.csv')
-    data = data[data['最新价'] != '-']
-    change = data['涨跌幅']
-    change = change.map(lambda x:re.findall(pattern, x)[0]).astype(float)
-    def count(change):
-        from collections import defaultdict
-        res = defaultdict(int)
-        for num in change:
-            if num < -7:
-                res['<-7'] += 1
-            elif -7 <= num < -5:
-                res['-5~-7'] += 1
-            elif -5 <= num < -3:
-                res['-3~-5'] += 1
-            elif -3 <= num < 0:
-                res['-3~0'] += 1
-            elif num == 0:
-                res['0'] += 1
-            elif 0 < num <= 3:
-                res['0~3'] += 1
-            elif 3 < num <= 5:
-                res['3~5'] += 1
-            elif 5 < num <= 7:
-                res['5~7'] += 1
-            elif num > 7:
-                res['>7'] += 1
-        return res
-
-    res = count(change)
-    res = list(res.items())
-    res.reverse()
-    x = [item[0] for item in res]
-    y = [item[1] for item in res]
-    plt.bar(x, y, color=['g']*4 + ['gray'] + ['r']*4)
-    for x, y in res:
-        plt.text(x, y, '%d'%y, ha='center', size=12)
-    plt.show()
